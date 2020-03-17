@@ -33,9 +33,13 @@ ques2 <- bom_data %>%
   mutate(Temp_diff = as.numeric(max_Temp) - as.numeric(min_Temp)) %>%
   filter(min_Temp > max_Temp) %>% 
   group_by(Month) %>%
-  summarise(average = mean(Temp_diff)) %>% 
-  view(ques2)
+  summarise(average = mean(Temp_diff))
 
-#Answer = the 7th month = 9.69
+#question_3:
+bom_station_long <- bom_stations %>% 
+  gather(key = "Station_number", values, -info) %>%
+  spread(key = info, value = values) %>% 
+  mutate(Station_number = as.numeric(Station_number))
+
 
 
