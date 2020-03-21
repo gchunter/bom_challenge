@@ -1,45 +1,64 @@
-bom_data <- read_csv("data/BOM_data.csv")
 library(tidyverse)
+bom_data <- read_csv("data/BOM_data.csv")
 bom_stations <- read_csv("data/BOM_stations.csv")
 view(bom_stations)
 view(bom_data)
 bom_data
 bom_stations
-#For each station, how many days have a minimum temp, a max temp,
-#and a rainfall measurement recorded?
-separate(bom_data, col = Temp_min_max, into = Temp_min, Temp_max,
-         sep = "/")
-bom_data_separate <- separate(bom_data, col = 5,
-                              into = c("Temp_min", "Temp_max"),
-                              sep = "/")
-bom_data_separate
-filter(bom_data_separate, Temp_min >= 0,
-       Temp_max >= 0, Rainfall >= 0)
-group_by_temp_min <- group_by(bom_data_separate,
-                               Temp_min)
 
-#Question 1
-ques_1 <- bom_data %>%
-  separate(Temp_min_max, into = c("mean_temp", "max_temp")) %>%
-  filter(mean_temp != "", max_temp != "", Rainfall != "-") %>%
+#Question_1: For each station, how many days have a min temp, max temp
+#and rainfall measurement
+bom_min_max_rain <- bom_data %>% 
+  separate(Temp_min_max, into = c("temp_min", "temp_max"), sep = "/") %>%
+  filter(temp_min >= 0, temp_max >=0, Rainfall >=0) %>%
   group_by(Station_number) %>%
   summarise(num_row = n())
-ques_1
 
-#Question 2: Which month saw the lowest average day temp difference
-ques2 <- bom_data %>%
-  separate(Temp_min_max, into = c("min_Temp", "max_Temp"), sep = "/", remove = FALSE) %>%
-  filter(min_Temp >= 0, max_Temp >= 0, Rainfall >= 0) %>%
-  mutate(Temp_diff = as.numeric(max_Temp) - as.numeric(min_Temp)) %>%
-  filter(min_Temp > max_Temp) %>% 
-  group_by(Month) %>%
-  summarise(average = mean(Temp_diff))
+write_csv(bom_min_max_rain, "results/q1_bom_min_max_rain")
 
-#question_3:
-bom_station_long <- bom_stations %>% 
-  gather(key = "Station_number", values, -info) %>%
+#Question_2: Which month saw the lowest average daily temp. difference?
+low_temp_diff <- bom_data %>% 
+  separate(Temp_min_max, into = c("temp_min", "temp_max"), sep = "/") %>%
+  filter(temp_min >=0, temp_max >= 0) %>%
+  mutate(temp_diff = as.numeric(temp_max) - as.numeric(temp_min)) %>%
+  group_by(Month) %>% 
+  summarise(average = mean(temp_diff)) %>% 
+  arrange(average) 
+
+write_csv(low_temp_diff, "results/q2_low_temp_diff")  
+  
+#Question_3: Which state saw the lowest average daily temp difference?
+bom_stations_tidy <- bom_stations %>% 
+  gather("station_number", values, -info) %>% 
   spread(key = info, value = values) %>% 
-  mutate(Station_number = as.numeric(Station_number))
+  mutate(station_number = as.numeric(station_number))
+
+q3_ans <- left_join(bom_data, bom_stations_tidy, by = c("Station_number" = "station_number")) %>% 
+  separate(Temp_min_max, into = c("temp_min", "temp_max"), sep = "/") %>% 
+  filter(temp_min >= 0, temp_max >= 0) %>% 
+  mutate(temp_diff = as.numeric(temp_max) - as.numeric(temp_min)) %>% 
+  filter(!is.na(temp_diff)) %>% 
+  group_by(state) %>% 
+  summarise(ave_temp_diff = mean(temp_diff)) %>% 
+  arrange(ave_temp_diff)
+
+write_csv(q3_ans, "results/q3_avg_temp_diff_state")
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
 
 
 
