@@ -44,21 +44,13 @@ q3_ans <- left_join(bom_data, bom_stations_tidy, by = c("Station_number" = "stat
 
 write_csv(q3_ans, "results/q3_avg_temp_diff_state")
 
+#question 4: Does the westmost or eastmost weather station in our dataset have
+# a higher average solar exposure?
 
+bom_data_tidy_stations <- left_join(bom_data, bom_stations_tidy, by = c("Station_number" = "station_number"))
 
-
-
-
-
-  
-  
-
-
-
-
-
-
-
-
-
-
+q4_answer <- bom_data_tidy_stations %>% 
+  filter(Solar_exposure != "-") %>% 
+  filter(lon == min(lon) | lon == max(lon)) %>%
+  group_by(Station_number, lon) %>%
+  summarise(avg_sol_exp = mean(Solar_exposure))
