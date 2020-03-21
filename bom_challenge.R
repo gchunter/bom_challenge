@@ -55,3 +55,5 @@ q4_answer <- bom_data_tidy_stations %>%
   group_by(Station_number, lon) %>%
   summarise(avg_sol_exp = mean(Solar_exposure))
 
+View(q4_answer)
+
