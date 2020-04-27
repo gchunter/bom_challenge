@@ -87,11 +87,26 @@ ggsave(filename = "results/q1_rain.png", plot = q1_rain,        #Save the rainfa
 ggsave(filename = "results/q1_solar.png", plot = q1_solar,      #Save the solar comparison
        width = 12, height = 10, dpi = 300, units = "cm")
 
+#Q2: Display the four measurements for the Perth station in a single scatter
+#plot by using additional aesthetic mappings
 
+q2 <- ggplot(perth_data, aes(x = temp_max, y = temp_min, colour = Solar_exposure, size = Rainfall)) +
+  geom_point(alpha = 0.8)
 
+ggsave(filename = "results/q2.png", plot = q2, width = 24, height = 10, dpi = 300, units = "cm")  
 
+#Q3: Take the four plots produced in Q1 and Q2 and save them as a multi-panel figure
+library(cowplot)                                              #load cowplot
+perth_panel <- plot_grid(q1_temp, q1_rain, q1_solar, q2)      #produce a multi-panel
+ggsave(filename = "results/perth_panel.png", plot = perth_panel,
+       width = 24, height = 18, dpi = 300, units = "cm")      #Save the plot to an image file
 
+#Q4: Use the entire BOM dataset, calculate the average monthly rainfall for each station.
+#Produce a lineplot to visualise this data and the state each station is in.
 
-
-
+bom_data %>%
+  group_by(Station_number, Month) %>% 
+  mutate(Rainfall = as.numeric(Rainfall)) %>% 
+  filter(!is.na(Rainfall)) %>% 
+  
 
