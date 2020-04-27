@@ -57,3 +57,41 @@ q4_answer <- bom_data_tidy_stations %>%
 
 View(q4_answer)
 
+#Introduction to data visualisation > Preparing plots for display
+#Challenge: putting it all together
+
+#Q1: For the Perth station (ID 9225), produce three scatter plots showing the 
+#relationship between the maximum temperature and each other measurement recorded
+#(minimum temperature, rainfall and solar exposure).
+
+#Filter the perth station data, seperate temp and change variables to dbl
+perth_data <- bom_data %>% 
+  filter(Station_number == 9225) %>% 
+  separate(Temp_min_max, into = c("temp_min", "temp_max"), sep = "/") %>% 
+  mutate(temp_min = as.numeric(temp_min), temp_max = as.numeric(temp_max),
+         Rainfall = as.numeric(Rainfall), Solar_exposure = as.numeric(Solar_exposure))
+
+
+q1_temp <- ggplot(data = perth_data, aes(x = temp_max, y = temp_min)) +
+  geom_point(alpha = 0.3)
+
+q1_rain <- ggplot(data = perth_data, aes(x = temp_max, y = Rainfall)) + 
+  geom_point(alpha = 0.3)
+
+q1_solar <- ggplot(data = perth_data, aes(x = temp_max, y = Solar_exposure))  
+
+ggsave(filename = "results/q1_temp.png", plot = q1_temp,        #Save the temperature comparison
+       width = 12, height = 10, dpi = 300, units = "cm")
+ggsave(filename = "results/q1_rain.png", plot = q1_rain,        #Save the rainfall comparison
+       width = 12, height = 10, dpi = 300, units = "cm")
+ggsave(filename = "results/q1_solar.png", plot = q1_solar,      #Save the solar comparison
+       width = 12, height = 10, dpi = 300, units = "cm")
+
+
+
+
+
+
+
+
+
